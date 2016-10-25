@@ -164,7 +164,7 @@ public class MyModMachineWindow : BaseMachineWindow
 
         //Send the command to the server
         if (!WorldScript.mbIsServer)
-            NetworkManager.instance.SendInterfaceCommand("MyAuthorID.MyModMachineInterface", "MyFunctionString", data.ToString(), null, machine, 0.0f);
+            NetworkManager.instance.SendInterfaceCommand(InterfaceName, InterfaceMyFunctionString, data.ToString(), null, machine, 0.0f);
         return true;
     }
 
@@ -176,7 +176,7 @@ public class MyModMachineWindow : BaseMachineWindow
         machine.MarkDirtyDelayed();
         dirty = true;
         if (!WorldScript.mbIsServer)
-            NetworkManager.instance.SendInterfaceCommand("MyAuthorID.MyModMachineInterface", "MyFunctionItem", null, item, machine, 0.0f);
+            NetworkManager.instance.SendInterfaceCommand(InterfaceName, InterfaceMyFunctionItem, null, item, machine, 0.0f);
         return true;
     }
 
@@ -189,11 +189,11 @@ public class MyModMachineWindow : BaseMachineWindow
         string key = nic.command;
         if (key != null)
         {
-            if (key == "MyFunctionItem")
+            if (key == InterfaceMyFunctionItem)
             {
                 MyModMachineWindow.MyFunctionItem(player, machine, nic.itemContext);
             }
-            else if (key == "MyFunctionString")
+            else if (key == InterfaceMyFunctionString)
             {
                 int data;
                 //Parse the string data (safely) and send to the appropriate function
