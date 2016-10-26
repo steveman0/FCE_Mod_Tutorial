@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System;
 
 //Inheriting BaseMachineWindow is required to support the GenericMachinePanelScript for machine UI
-//Currently this is only supported through the community tools UI package
-//Eventual vanilla UI support will still use this format most likely
 public class MyModMachineWindow : BaseMachineWindow 
 {
     //Interface definition for network commands
@@ -33,16 +31,8 @@ public class MyModMachineWindow : BaseMachineWindow
     {
         MyModMachine machine = targetEntity as MyModMachine;
 
-        //UI safety checks and locking to avoid conflicts with other UI panels that other mod machines may use
-        //These probably won't be needed if vanilla mod UI support is added
         if (machine == null)
-        {
-            GenericMachinePanelScript.instance.Hide();
-            UIManager.RemoveUIRules("Machine");
             return;
-        }
-        UIUtil.UIdelay = 0;
-        UIUtil.UILock = true;
 
         //Definition of window contents
         this.manager.SetTitle("My Machine Window Title");
@@ -52,7 +42,7 @@ public class MyModMachineWindow : BaseMachineWindow
         this.manager.AddButton("buttonidentifier", "Button Text", 0, 120);
         this.manager.AddPowerBar("powerbaridentifier", 0, 180);
 
-        //Mark it dirt if you have contents that need updating immediately
+        //Mark it dirty if you have contents that need updating immediately
         dirty = true;
     }
 
@@ -61,14 +51,13 @@ public class MyModMachineWindow : BaseMachineWindow
     {
         MyModMachine machine = targetEntity as MyModMachine;
 
-        //Similar UI safety checks and locks
+        //If the machine reference is lost we need to exit the window and remove the UI rules that lock the screen position allow cursor movement
         if (machine == null)
         {
             GenericMachinePanelScript.instance.Hide();
             UIManager.RemoveUIRules("Machine");
             return;
         }
-        UIUtil.UIdelay = 0;
 
         //Redraw if network update requires a change in the window contents
         if (networkredraw)
@@ -77,6 +66,10 @@ public class MyModMachineWindow : BaseMachineWindow
         //Some example update functions below
         this.manager.UpdatePowerBar("powerbaridentifier", 0, 100f);
 
+        //This function hooks up the scroll wheel to the panel scroll bar
+        GenericMachinePanelScript.instance.Scroll_Bar.GetComponent<UIScrollBar>().scrollValue -= Input.GetAxis("Mouse ScrollWheel");
+
+        //Only update content below if dirty - save time looking up icon information if they don't need to change
         if (!dirty)
             return;
 
@@ -84,8 +77,6 @@ public class MyModMachineWindow : BaseMachineWindow
         this.manager.UpdateLabel("labelidentifier", "New Label Text", Color.white);
 
         //Set dirty to false once updated
-        //With a power bar you may want to update on every frame if power will change often
-        //Otherwise you'll need to set dirty true whenever the power level changes
         dirty = false;
     }
 
@@ -99,7 +90,7 @@ public class MyModMachineWindow : BaseMachineWindow
             dirty = true;
             return true;
         }
-        if (name == "itemicon")
+        else if (name == "itemicon")
         {
             //You can trigger on clicking icons too (you can pass an item reference associated with the slow instead)
             MyModMachineWindow.MyFunctionItem(WorldScript.mLocalPlayer, targetEntity as MyModMachine, ItemManager.SpawnItem(100));
@@ -203,7 +194,7 @@ public class MyModMachineWindow : BaseMachineWindow
         }
         return new NetworkInterfaceResponse()
         {
-            entity = (SegmentEntity)machine,
+            entity = machine,
             inventory = player.mInventory
         };
     }

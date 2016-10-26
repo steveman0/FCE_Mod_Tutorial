@@ -6,8 +6,10 @@ using FortressCraft.Community.Utilities;    //The community tools Pack! Highly r
 
 public class MyModMachine : MachineEntity // Add Interfaces such as PowerConsumerInterface or the Storage interfaces
 {
-    //Field definition goes here
+    //Field definitions go here
     public int data;
+    public GameObject HoloCubePreview;
+    public bool mbLinkedToGo;
 
     //Constructor - called on machine creation - should use the parameters as called below to retain compatibility if mod stuff changes
     //You can add in your own parameters if you need them though
@@ -43,9 +45,15 @@ public class MyModMachine : MachineEntity // Add Interfaces such as PowerConsume
         //It's called on the main thread so anything involving GameObjects, audio, or other Unity functions can be dealt with here
         //Because it is called every frame be mindful of how much you put here!! LowFrequencyUpdate is better for most gameplay calculations.
 
-        //Instantiate a new gameobject, attach it to the parent object, and position it relative to the original - in this case a holo preview of a cube
-        GameObject lObj = SpawnableObjectManagerScript.instance.maSpawnableObjects[(int)SpawnableObjectEnum.MassStorageOutputPort].transform.Search("HoloCube").gameObject;
-        GameObject HoloCubePreview = (GameObject)GameObject.Instantiate(lObj, this.mWrapper.mGameObjectList[0].gameObject.transform.position + new Vector3(0.0f, 0.75f, 0.0f), Quaternion.identity);
+        //Only run this once to avoid creating duplicate objects
+        if (!mbLinkedToGo)
+        {
+            //Instantiate a new gameobject, attach it to the parent object, and position it relative to the original - in this case a holo preview of a cube
+            //Keep in mind that if you create extra objects like this you should keep a reference of them and remove them later if the machine is deleted
+            GameObject lObj = SpawnableObjectManagerScript.instance.maSpawnableObjects[(int)SpawnableObjectEnum.MassStorageOutputPort].transform.Search("HoloCube").gameObject;
+            HoloCubePreview = (GameObject)GameObject.Instantiate(lObj, this.mWrapper.mGameObjectList[0].gameObject.transform.position + new Vector3(0.0f, 0.75f, 0.0f), Quaternion.identity);
+            this.mbLinkedToGo = true;
+        }
     }
 
     public override string GetPopupText()
@@ -86,6 +94,8 @@ public class MyModMachine : MachineEntity // Add Interfaces such as PowerConsume
     //If you create any extra GameObjects you should remove them here so they don't take up resources while the player is away
     public override void UnitySuspended()
     {
+        GameObject.Destroy(this.HoloCubePreview);
+        this.mbLinkedToGo = false;
         base.UnitySuspended();
     }
 
