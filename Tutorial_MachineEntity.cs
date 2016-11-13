@@ -2,7 +2,7 @@
 using System.IO;    //For data read/write methods
 using System.Collections.Generic;   //Working with Lists and Collections
 using System.Linq;   //More advanced manipulation of lists/collections
-using FortressCraft.Community.Utilities;    //The community tools Pack! Highly recommend for useful functions
+using FortressCraft.Community.Utilities;    //The community tools Pack! Highly recommend for useful functions: https://github.com/steveman0/FCECommunityTools/tree/UIUtil
 
 public class MyModMachine : MachineEntity // Add Interfaces such as PowerConsumerInterface or the Storage interfaces
 {
