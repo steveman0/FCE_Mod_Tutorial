@@ -44,6 +44,7 @@ public class MyModMachineWindow : BaseMachineWindow
 
         //Mark it dirty if you have contents that need updating immediately
         dirty = true;
+        networkredraw = false;
     }
 
     //Called every frame to update the window contents 
